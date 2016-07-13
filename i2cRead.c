@@ -3,6 +3,7 @@
 */
 
 #include <stdio.h>
+#include <linux/i2c-dev.h>
 
 #define ACCEL_ADDR 0x68 //i2c addr for accelrometer 
 
@@ -24,6 +25,13 @@ int main(void)
 	if(DevHandle < 0)//check handle is okay
 	{
 		printf("failed to open i2c handle\n");
+		return -1;
+	}
+	
+	//setting i2c address 
+	if(ioctl(DevHandle, I2C_SLAVE, ACELL_ADDR) <0)
+	{
+		printf("failed to set device address\n");
 		return -1;
 	}
 
