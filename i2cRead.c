@@ -6,7 +6,7 @@
 #include <linux/i2c-dev.h>
 #include <fcntl.h>//open function
 #include <sys/ioctl.h>//ioctl function 
-#include <unistd.h>//read function
+#include <unistd.h>//read and write functions
 #include <stdint.h>
 
 #define ACCEL_ADDR 0x68 //i2c addr for accelrometer 
@@ -43,6 +43,13 @@ int main(void)
 	}
 
 	//write config registers
+	Reg16b[0] = ACCEL_CON_REG;
+	Reg16b[1] = ACCEL_CONFIG;
+ 	if( write(DevHandle, Reg16b, 2) != 2 )
+ 	{
+ 		printf("failed to write range config reg\n");
+ 		return -1;
+ 	}
 	
 	while(1)
 	{
@@ -61,12 +68,13 @@ int main(void)
 		
 		
 		//get sensible values and print
-		XAccel = (( (Reg16b[1] << 8) | Reg16b[0]) / AccScale);/*Unkowns
+		XAccel = (( (Reg16b[1] << 8) | Reg16b[2]) / AccScale);/*Unkowns
 															  **negitive values' minus sign properly interpreted?
 															  *
 															  **is the 15-8 bits stored in Reg16b[1] and not Reg16b[2]?
 															  */
 		printf("acceleration measured is %0.2f ms^-2\n", XAccel);
+		printf("actual reg values are %x;%x\n", Reg16b[1], Reg16b[2]);
 		
 		usleep(250000);//250 ms
 	}
