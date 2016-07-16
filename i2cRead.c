@@ -20,7 +20,9 @@
 
 int DevHandle; 
 int NumRead;//debug value	
-uint8_t Reg16b[3];//array for reading/writing 16 bits (2 registers)
+uint8_t Reg16b[3];// array for reading/writing 16 bits (2 registers)
+uint16_t U16val;// usigned combined val
+int16_t S16val;// signed combined value  
 float XAccel; // m/s/s value stored
 float AccScale = ACCEL_DIVSOR/9.80665; 
 
@@ -68,7 +70,12 @@ int main(void)
 		
 		
 		//get sensible values and print
-		XAccel = (( (Reg16b[1] << 8) | Reg16b[2]) / AccScale);/*Unkowns
+		U16val = ((uint16_t)Reg16b[1] << 8) | ((uint16_t)Reg16b[2]);
+		S16val = (int16_t)U16val;
+		XAccel = S16val / AccScale;
+		
+		//XAccel = (( (Reg16b[1] << 8) | Reg16b[2]) / AccScale);
+															  /*Unkowns
 															  **negitive values' minus sign properly interpreted?
 															  *
 															  **is the 15-8 bits stored in Reg16b[1] and not Reg16b[2]?
