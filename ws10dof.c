@@ -2,58 +2,67 @@
  *start()
  *update()
  *range()	
- *functions working with ws10dof structure if accread.h 
+ *functions working with ws10dofhandle structure in ws10dof.h 
  */
 
 #include "i2c.h"
+#include "ws10dof.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 
-#define X_ACCEL_REG 0x3b//move to header 
-#define ACCEL_ADDRESS 0x68
-#define ACCEL_DIVISOR 8192
-#define RANGE_CON_REG 0x1c
-#define RANGE_CON_VAL 0x08
-
-int i;
-struct i2c_handle * DevHandle;
-uint8_t Buf16b[2];
-uint16_t U16val;
-int16_t  S16val;
-float Accel;
-float Divisor;
-
-int main(void)
+struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 {
-	Divisor = ACCEL_DIVISOR / 9.806; 
+	
+	struct ws10dofhandle DevHandle;
+	Devhandle.I2CHandle = i2c_init(I2CBus, Address, 0);
+	
+	//configure
+	ws10dof_range(DevHandle, Range);
+	
+	return DeVHandle;
+}
 
-	//open i2c device
-	DevHandle = i2c_init(1, ACCEL_ADDRESS, 0);
-	
-	//write range config register 
-	Buf16b[0] = RANGE_CON_VAL;
-	i2c_write_to_reg(DevHandle, RANGE_CON_REG, Buf16b, 1);
-	
-	
-	for(i = 0; i < 100 ;i++)
+int ws10dof_range(struct * ws10dofhandle, int AccRange)
+{
+	uint8_t ConBuf[2];
+	switch (AccRange)
 	{	
-		//read x acceleration
-		i2c_read_from_reg(DevHandle, X_ACCEL_REG, Buf16b, 2);
+		case 2: ConBuf[0] = 0x0; ConBuf[1] = 0x0; DevHandle->AccDiv = (16384/9.806) ; break;
+		case 4: ConBuf[0] = 0x0; ConBuf[1] = 0x8; DevHandle->AccDiv = (8192/9.806)  ;break;
+		case 8: ConBuf[0] = 0x1; ConBuf[1] = 0x0; DevHandle->AccDiv = (4096/9.806)  ;break;
+		case 16: ConBuf[0] = 0x1; ConBuf[1] = 0x8;DevHandle->AccDiv = (2048/9.806)  ;break;
+		default: printf("invalid range setting of +- %d g\n"); return -1;
 		
-		//sensible value
-		U16val = ((uint16_t)Buf16b[0] << 8) | ((uint16_t)Buf16b[1]);
-		S16val = (int16_t)U16val;
-		
-		Accel = S16val / Divisor;
-		
-		printf("acceleration is %0.3f m/s/s\n", Accel);
-		
-		//actual reg values
-		printf("actual reg values are: %x and %x\n", Buf16b[0], Buf16b[1]);
-		usleep(100000);//100 ms
-			
-	}
 	
-return 0;
+	}
+	i2c_write_to_reg(DevHandle->I2CHandle, ACCEL_RANGE_REG, ConBuf, 2);
+	return 0;
+}
+
+int wsdof_update(struct ws10dofhandle * DevHandle)
+{
+	//read acceloromter
+	uint8_t Buf6Bytes[6];
+	uint16_t U16val;
+	int16_t S16val;
+	
+	i2c_read_from_reg(DevHandle->I2CHandle, ACCEL_FIRST_REG, Buf6Bytes, 6);
+	//x
+	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
+	S16val = (int16_t)U16val;
+	DevHandle->AccX = (S16val / DevHandle->AccDiv); 
+	//y
+	U16val = ((uint16_t)Buf6Bytes[2] << 8)|((uint16_t)Buf6Bytes[3]);
+	S16val = (int16_t)U16val;
+	DevHandle->AccY = (S16val / DevHandle->AccDiv); 
+	//z
+	U16val = ((uint16_t)Buf6Bytes[4] << 8)|((uint16_t)Buf6Bytes[5]);
+	S16val = (int16_t)U16val;
+	DevHandle->AccZ = (S16val / DevHandle->AccDiv); 
+	
+	//read gyro
+	//read compass
+	
+	return 0;
 }
