@@ -1,14 +1,18 @@
-#include "ws10dof"
+#ifndef _PSEUDOMOUSE_H_
+#define _PSEUDOMOUSE_H_
 
-#define CYCLIC_PERIOD 0.010 // seconds since speed last adjusted 
+
+#include "ws10dof.h"
+
+#define CYCLIC_PERIOD 10 // ms since speed last adjusted 
 #define MOUSE_ACCEL_RANGE 4// +-4g
 
 struct pseudomouse
 {
 	//actual velocity in m/s
 	float VelX;
-	float VelX;
-	float VelX;
+	float VelY;
+	float VelZ;
 
 	struct ws10dofhandle DevHandle;
 };
@@ -16,3 +20,5 @@ struct pseudomouse
 
 struct pseudomouse startMouse();
 int updateSpeeds(struct pseudomouse * Mouse);
+
+#endif

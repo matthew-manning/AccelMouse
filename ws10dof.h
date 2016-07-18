@@ -1,3 +1,6 @@
+#ifndef _WS10DOF_H_
+#define _WS10DOF_H_
+
 #include "i2c.h"
 
 #define ACCEL_FIRST_REG 0x3b
@@ -34,10 +37,12 @@ struct ws10dofhandle
 	float Pressure;
 	
 };
-typedef struct ws10dofhandle ws10dofhandle;//make better short type name 
+//typedef struct ws10dofhandle ws10dofhandle;//make better short type name 
 
 struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange);
 
-int ws10dof_range(struct * ws10dofhandle, int AccRange);
+int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange);
 
-int wsdof_update(struct ws10dofhandle * DevHandle)
+int ws10dof_update(struct ws10dofhandle * DevHandle);
+
+#endif

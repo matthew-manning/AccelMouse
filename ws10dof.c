@@ -14,16 +14,16 @@
 struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 {
 	
-	struct ws10dofhandle DevHandle;
-	Devhandle.I2CHandle = i2c_init(I2CBus, Address, 0);
+	struct ws10dofhandle  DevHandle;
+	DevHandle.I2CHandle = *i2c_init(I2CBus, Address, 0);
 	
 	//configure
-	ws10dof_range(DevHandle, Range);
+	ws10dof_range(&DevHandle, AccRange);
 	
-	return DeVHandle;
-}
+	return DevHandle;
+};
 
-int ws10dof_range(struct * ws10dofhandle, int AccRange)
+int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange)
 {
 	uint8_t ConBuf[2];
 	switch (AccRange)
@@ -32,22 +32,22 @@ int ws10dof_range(struct * ws10dofhandle, int AccRange)
 		case 4: ConBuf[0] = 0x0; ConBuf[1] = 0x8; DevHandle->AccDiv = (8192/9.806)  ;break;
 		case 8: ConBuf[0] = 0x1; ConBuf[1] = 0x0; DevHandle->AccDiv = (4096/9.806)  ;break;
 		case 16: ConBuf[0] = 0x1; ConBuf[1] = 0x8;DevHandle->AccDiv = (2048/9.806)  ;break;
-		default: printf("invalid range setting of +- %d g\n"); return -1;
+		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;
 		
 	
 	}
-	i2c_write_to_reg(DevHandle->I2CHandle, ACCEL_RANGE_REG, ConBuf, 2);
+	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, ConBuf, 2);
 	return 0;
 }
 
-int wsdof_update(struct ws10dofhandle * DevHandle)
+int ws10dof_update(struct ws10dofhandle * DevHandle)
 {
 	//read acceloromter
 	uint8_t Buf6Bytes[6];
 	uint16_t U16val;
 	int16_t S16val;
 	
-	i2c_read_from_reg(DevHandle->I2CHandle, ACCEL_FIRST_REG, Buf6Bytes, 6);
+	i2c_read_from_reg(&DevHandle->I2CHandle, ACCEL_FIRST_REG, Buf6Bytes, 6);
 	//x
 	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
 	S16val = (int16_t)U16val;
