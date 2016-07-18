@@ -14,4 +14,5 @@ struct pseudomouse
 };
 //typedef 
 
-
+struct pseudomouse startMouse();
+int updateSpeeds(struct pseudomouse * Mouse);

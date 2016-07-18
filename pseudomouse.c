@@ -17,6 +17,8 @@ struct pseudomouse startMouse()
 
 int updateSpeeds(struct pseudomouse * Mouse)
 {
+	/*need to modifiy code to adjust for constant gravity*/
+
 	//calling periodically handles to x time between calculations	
 	Mouse->VelX += Mouse->Devhandle.AccX * CYCLIC_RERIOD;
 	Mouse->VelY += Mouse->Devhandle.AccY * CYCLIC_RERIOD;
