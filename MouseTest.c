@@ -21,6 +21,7 @@ int main(void)
 		//get time
 		clock_gettime(CLOCK_MONOTONIC, &TimeStamp);
 		RefTime = (TimeStamp.tv_sec*1000)+(TimeStamp.tv_nsec * 1000000);
+		printf("RefTime is %0.2f ms\n", RefTime);
 		
 		updateSpeeds( &TestMouse);
 		
