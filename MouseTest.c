@@ -5,6 +5,8 @@
 struct pseudomouse TestMouse;
 int i;
 struct timespec TimeStamp;
+
+//should be doubles?
 float RefTime;//timestamp for 10 ms cycle
 float CurTime;//times in ms
 
@@ -35,6 +37,7 @@ int main(void)
 			CurTime = (TimeStamp.tv_sec*1000)+(TimeStamp.tv_nsec * 1000000);
 		}
 		
+		usleep(1000000);//for debugging
 	}
 	return 0;
 }
