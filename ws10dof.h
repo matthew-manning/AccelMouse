@@ -6,7 +6,7 @@
 #define ACCEL_FIRST_REG 0x3b
 #define ACCEL_ADDRESS 0x68
 #define ACCEL_DIVISOR 8192
-#define ACCEL_RANGE_REG 0x1c
+#define ACCEL_RANGE_REG 0x1b
 #define RANGE_CON_VAL 0x08 // +- 4g
 
 struct ws10dofhandle

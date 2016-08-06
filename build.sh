@@ -1,4 +1,4 @@
 #! /bin/bash
-#build and link AccelRead.c
+#build and link AccelRead
 
-arm-linux-gnueabi-gcc -Wall i2c.c pseudomouse.c ws10dof.c MouseTest.c -o MouseTest
+gcc -Wall i2c.c pseudomouse.c ws10dof.c MouseTest.c -o MouseTest
