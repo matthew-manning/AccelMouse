@@ -10,7 +10,6 @@ double RefTime;//timestamp for 10 ms cycle
 double CurTime;//times in ms
 
 
-
 int main(void)
 {
 	TestMouse = startMouse();
@@ -37,8 +36,10 @@ int main(void)
 		{
 			clock_gettime(CLOCK_MONOTONIC, &TimeStamp);
 			CurTime = (TimeStamp.tv_sec*1000)+(TimeStamp.tv_nsec * 1000000);
+
 		} */
 		usleep(1000000);//for debugging		
+
 	}
 	return 0;
 }

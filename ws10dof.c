@@ -36,7 +36,9 @@ int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange)
 		
 	
 	}
+
 	printf("Range set function set using [%x,%x]", ConBuf[0], ConBuf[1]);//for debugging
+
 	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, ConBuf, 2);
 	return 0;
 }
