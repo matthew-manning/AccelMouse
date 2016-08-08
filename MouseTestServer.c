@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 struct pseudomouse TestMouse;
 int i;

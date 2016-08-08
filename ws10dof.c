@@ -13,12 +13,21 @@
 
 struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 {
+	uint8_t ConBuf[3];
 	
 	struct ws10dofhandle  DevHandle;
 	DevHandle.I2CHandle = *i2c_init(I2CBus, Address, 0);
 	
-	//configure
+	//configure accelorometer
 	ws10dof_range(&DevHandle, AccRange);
+	
+	//configure compass
+	ConBuf[0] = 0x18;
+	ConBuf[1] = 0x20;
+	ConBuf[2] = 0x80;
+	i2c_write_to_reg(&DevHandle.I2CHandle, COMPASS_CON_REG, ConBuf, 3);
+	
+	
 	
 	return DevHandle;
 };
@@ -66,6 +75,19 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	
 	//read gyro
 	//read compass
+	i2c_read_from_reg(&DevHandle->I2CHandle, COMPASS_FIRST_REG, Buf6Bytes, 6);
+	//x
+	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
+	S16val = (int16_t)U16val;
+	DevHandle->CompX = (S16val / DevHandle->AccDiv); 
+	//y
+	U16val = ((uint16_t)Buf6Bytes[2] << 8)|((uint16_t)Buf6Bytes[3]);
+	S16val = (int16_t)U16val;
+	DevHandle->CompY = (S16val / DevHandle->AccDiv); 
+	//z
+	U16val = ((uint16_t)Buf6Bytes[4] << 8)|((uint16_t)Buf6Bytes[5]);
+	S16val = (int16_t)U16val;
+	DevHandle->CompZ = (S16val / DevHandle->AccDiv); 
 	
 	return 0;
 }
