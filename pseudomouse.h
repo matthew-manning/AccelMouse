@@ -4,7 +4,7 @@
 
 #include "ws10dof.h"
 
-#define CYCLIC_PERIOD 10 // ms since speed last adjusted 
+#define CYCLIC_PERIOD 20 // ms since speed last adjusted 
 #define MOUSE_ACCEL_RANGE 4// +-4g
 
 struct pseudomouse

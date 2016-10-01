@@ -71,9 +71,9 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	
 	i2c_read_from_reg(&DevHandle->I2CHandle, ACCEL_FIRST_REG, (char *)Buf6Bytes, 6);
 	
-	DevHandle->AccX = BuffToI16(&Buf6Bytes[0]) / DevHandle->AccDiv;
-	DevHandle->AccY = BuffToI16(&Buf6Bytes[2]) / DevHandle->AccDiv;
-	DevHandle->AccZ = BuffToI16(&Buf6Bytes[4]) / DevHandle->AccDiv;
+	DecHandle->AccX = BuffToI16(&Buf6Bytes[0]) / DevHandle->AccDiv;
+	DecHandle->AccY = BuffToI16(&Buf6Bytes[2]) / DevHandle->AccDiv;
+	DecHandle->AccZ = BuffToI16(&Buf6Bytes[4]) / DevHandle->AccDiv;
 	
 	//x
 	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
@@ -90,7 +90,7 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	
 	//read gyro
 	//read compass
-	i2c_read_from_reg(&DevHandle->I2CHandle, COMPASS_FIRST_REG, (char *)Buf6Bytes, 6);
+	i2c_read_from_reg(&DevHandle->I2CHandle, COMPASS_FIRST_REG, Buf6Bytes, 6);
 	//x
 	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
 	S16val = (int16_t)U16val;

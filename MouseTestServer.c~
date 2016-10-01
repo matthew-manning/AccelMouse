@@ -21,7 +21,7 @@ int SocketFD;
 int ConnectionHandle;
 struct sockaddr_in MouseAddr;
 struct sockaddr_in ClientAddr;
-socklen_t ClientAddrSize;
+int CliientAddrSize;
 
 
 int main(void)
