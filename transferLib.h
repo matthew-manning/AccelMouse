@@ -12,7 +12,7 @@
 #include "pseudomouse.h"
 
 int waitForHost(int port);
-int sendMouseData(int ConHandle, struct pseudomouse Mouse);
+int sendMouseData(int ConHandle, struct pseudomouse Mouse, int CycleTime);
 
 
 #endif

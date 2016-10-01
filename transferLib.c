@@ -43,15 +43,15 @@ int waitForHost(int Port)
 	return ConnectionHandle;
 }
 
-int sendMouseData(int ConHandle, struct pseudomouse Mouse)
+int sendMouseData(int ConHandle, struct pseudomouse Mouse, int CycleTime)
 {
 	int RetCode;
 	int NumWritten;
 	
-	char Packet[70]; 
-	sprintf(Packet,"vel x: %0.3f, vel y: %0.3f, vel z: %0.3f\n", Mouse.VelX, Mouse.VelY, Mouse.VelZ);//Okay?
+	char Packet[100]; 
+	sprintf(Packet,"vel x: %0.3f, vel y: %0.3f, vel z: %0.3f, Cycle time: %d\n", Mouse.VelX, Mouse.VelY, Mouse.VelZ, CycleTime);//Okay?
 	
-	NumWritten = write(ConHandle, Packet, sizeof(Packet));
+	NumWritten = write(ConHandle, Packet, strlen(Packet)+1);
 	if(NumWritten < 0)
 	{
 		printf("failed to write to socket\n");
