@@ -34,21 +34,36 @@ struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 
 int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange)
 {
-	uint8_t ConBuf[2];
+	//uint8_t ConBuf[2];
+	uint8_t ConVal;
 	switch (AccRange)
 	{	
-		case 2: ConBuf[0] = 0x0; ConBuf[1] = 0x0; DevHandle->AccDiv = (16384/9.806) ; break;
+		/*case 2: ConBuf[0] = 0x0; ConBuf[1] = 0x0; DevHandle->AccDiv = (16384/9.806) ; break;
 		case 4: ConBuf[0] = 0x0; ConBuf[1] = 0x8; DevHandle->AccDiv = (8192/9.806)  ;break;
 		case 8: ConBuf[0] = 0x1; ConBuf[1] = 0x0; DevHandle->AccDiv = (4096/9.806)  ;break;
 		case 16: ConBuf[0] = 0x1; ConBuf[1] = 0x8;DevHandle->AccDiv = (2048/9.806)  ;break;
-		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;
+		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;*/
 		
+		
+		case 2: ConVal = 0x00; DevHandle->AccDiv = (16384/9.806) ; break;
+		case 4: ConVal = 0x08; DevHandle->AccDiv = (16384/9.806) ; break;
+		case 8: ConVal = 0x10; DevHandle->AccDiv = (16384/9.806) ; break;
+		case 16: ConVal = 0x18; DevHandle->AccDiv = (16384/9.806) ; break;
+	
+		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;
 	
 	}
 
+	printf("Range set function set using [0x%x]", ConVal);//for debugging
+
+	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, (char *)(&ConVal), 1);
+
+	/*
 	printf("Range set function set using [%x,%x]", ConBuf[0], ConBuf[1]);//for debugging
 
 	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, (char *)ConBuf, 2);
+	*/
+	
 	return 0;
 }
 

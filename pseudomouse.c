@@ -1,7 +1,7 @@
 #include "ws10dof.h"
 #include "pseudomouse.h"
 
-struct pseudomouse startMouse()
+struct pseudomouse startMouse(int Range)
 {
 	struct pseudomouse Mouse;
 	//assume at rest
@@ -10,7 +10,7 @@ struct pseudomouse startMouse()
 	Mouse.VelZ = 0;
 
 	//start accelorometer
-	Mouse.DevHandle = ws10dof_start(1, 0x68, MOUSE_ACCEL_RANGE);
+	Mouse.DevHandle = ws10dof_start(1, 0x68, Range);
 
 	return Mouse;
 }

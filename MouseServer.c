@@ -9,6 +9,7 @@
 
 #include <time.h>
 #include <sys/types.h>
+#include <stdio.h>
 
 
 #define MOUSE_PORT 4000
@@ -23,8 +24,9 @@ double CurTime;//times in ms
 
 int main(void)
 {
-	ServMouse = startMouse();
+	ServMouse = startMouse(16);
 	HostConnection = waitForHost(MOUSE_PORT);
+	printf("connection established\n");
 	RefTime = 0;
 	CurTime = 0;
 	
