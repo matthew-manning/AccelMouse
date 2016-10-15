@@ -13,6 +13,12 @@ struct pseudomouse
 	float VelX;
 	float VelY;
 	float VelZ;
+	
+	float ScrubGravity;
+	
+	float TiltPitch;
+	float TiltRoll;
+	float TiltYaw; 
 
 	struct ws10dofhandle DevHandle;
 };

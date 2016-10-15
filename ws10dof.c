@@ -32,38 +32,42 @@ struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 	return DevHandle;
 };
 
-int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange)
+int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange, int GyroRange)
 {
-	//uint8_t ConBuf[2];
+	//setting accelrange
 	uint8_t ConVal;
 	switch (AccRange)
 	{	
-		/*case 2: ConBuf[0] = 0x0; ConBuf[1] = 0x0; DevHandle->AccDiv = (16384/9.806) ; break;
-		case 4: ConBuf[0] = 0x0; ConBuf[1] = 0x8; DevHandle->AccDiv = (8192/9.806)  ;break;
-		case 8: ConBuf[0] = 0x1; ConBuf[1] = 0x0; DevHandle->AccDiv = (4096/9.806)  ;break;
-		case 16: ConBuf[0] = 0x1; ConBuf[1] = 0x8;DevHandle->AccDiv = (2048/9.806)  ;break;
-		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;*/
-		
-		
 		case 2: ConVal = 0x00; DevHandle->AccDiv = (16384/9.806) ; break;
-		case 4: ConVal = 0x08; DevHandle->AccDiv = (16384/9.806) ; break;
-		case 8: ConVal = 0x10; DevHandle->AccDiv = (16384/9.806) ; break;
-		case 16: ConVal = 0x18; DevHandle->AccDiv = (16384/9.806) ; break;
+		case 4: ConVal = 0x08; DevHandle->AccDiv = (8192/9.806) ; break;
+		case 8: ConVal = 0x10; DevHandle->AccDiv = (4096/9.806) ; break;
+		case 16: ConVal = 0x18; DevHandle->AccDiv = (2048/9.806) ; break;
 	
 		default: printf("invalid range setting of +- %d g\n", AccRange); return -1;
 	
 	}
 
-	printf("Range set function set using [0x%x]", ConVal);//for debugging
+	printf("Acceleration Range set function set using [0x%x]", ConVal);//for debugging
 
 	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, (char *)(&ConVal), 1);
 
-	/*
-	printf("Range set function set using [%x,%x]", ConBuf[0], ConBuf[1]);//for debugging
-
-	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, (char *)ConBuf, 2);
-	*/
+	//seeting gyro range
+	switch (GyroRange)
+	{	
+		case 2: ConVal = 0x00; DevHandle->GyroDiv = (131) ; break;
+		case 4: ConVal = 0x08; DevHandle->GyroDiv = (65.5) ; break;
+		case 8: ConVal = 0x10; DevHandle->GyroDiv = (32.8) ; break;
+		case 16: ConVal = 0x18; DevHandle->GyroDiv = (16.4) ; break;
 	
+		default: printf("invalid range setting of +- %d deg/s\n", AccRange); return -1;
+	
+	}
+
+	printf("Acceleration Range set function set using [0x%x]", ConVal);//for debugging
+
+	i2c_write_to_reg(&DevHandle->I2CHandle, GYRO_RANGE_REG, (char *)(&ConVal), 1);
+
+
 	return 0;
 }
 
@@ -89,7 +93,7 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	DevHandle->AccX = BuffToI16(&Buf6Bytes[0]) / DevHandle->AccDiv;
 	DevHandle->AccY = BuffToI16(&Buf6Bytes[2]) / DevHandle->AccDiv;
 	DevHandle->AccZ = BuffToI16(&Buf6Bytes[4]) / DevHandle->AccDiv;
-	
+	/*
 	//x
 	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
 	S16val = (int16_t)U16val;
@@ -102,22 +106,14 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	U16val = ((uint16_t)Buf6Bytes[4] << 8)|((uint16_t)Buf6Bytes[5]);
 	S16val = (int16_t)U16val;
 	DevHandle->AccZ = (S16val / DevHandle->AccDiv); 
+	*/
 	
 	//read gyro
-	//read compass
-	i2c_read_from_reg(&DevHandle->I2CHandle, COMPASS_FIRST_REG, (char *)Buf6Bytes, 6);
-	//x
-	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
-	S16val = (int16_t)U16val;
-	DevHandle->CompX = (S16val / DevHandle->AccDiv); 
-	//y
-	U16val = ((uint16_t)Buf6Bytes[2] << 8)|((uint16_t)Buf6Bytes[3]);
-	S16val = (int16_t)U16val;
-	DevHandle->CompY = (S16val / DevHandle->AccDiv); 
-	//z
-	U16val = ((uint16_t)Buf6Bytes[4] << 8)|((uint16_t)Buf6Bytes[5]);
-	S16val = (int16_t)U16val;
-	DevHandle->CompZ = (S16val / DevHandle->AccDiv); 
+	i2c_read_from_reg(&DevHandle->I2CHandle, GYRO_FIRST_REG, (char *)Buf6Bytes, 6);
+	
+	DevHandle->VelPitch = BuffToI16(&Buf6Bytes[0]) / DevHandle->GyroDiv;
+	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[2]) / DevHandle->GyroDiv;
+	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[4]) / DevHandle->GyroDiv;
 	
 	return 0;
 }

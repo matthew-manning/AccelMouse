@@ -6,7 +6,9 @@
 #define ACCEL_FIRST_REG 0x3b
 #define ACCEL_ADDRESS 0x68
 #define ACCEL_DIVISOR 8192
-#define ACCEL_RANGE_REG 0x1b
+#define ACCEL_RANGE_REG 0x1c
+#define GYRO_RANGE_REG 0x1b
+#define GYRO_FIRST_REG 0x43
 #define COMPASS_CON_REG 0x00
 #define COMPASS_FIRST_REG 0x03
 #define RANGE_CON_VAL 0x08 // +- 4g
@@ -22,19 +24,11 @@ struct ws10dofhandle
 	float AccZ;
 	float AccDiv; //to m/s/s
 	
-	/*degrees /s/s ???
-	 *
-	 */
-	float GyroX;
-	float GyroY;
-	float GyroZ;
-	
-	/*degrees from xxxx ??
-	 *
-	 */
-	float CompX;
-	float CompY;
-	float CompZ;
+	// deg/sec
+	float VelPitch;//x
+	float VelRoll;//y
+	float VelYaw;//z
+	float GyroDiv;//to deg/s
 	
 	float Pressure;
 	
