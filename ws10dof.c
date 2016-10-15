@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <unistd.h>
 
-struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
+struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange, int GyroRange)
 {
 	uint8_t ConBuf[3];
 	
@@ -19,7 +19,7 @@ struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange)
 	DevHandle.I2CHandle = *i2c_init(I2CBus, Address, 0);
 	
 	//configure accelorometer
-	ws10dof_range(&DevHandle, AccRange);
+	ws10dof_range(&DevHandle, AccRange, GyroRange);
 	
 	//configure compass
 	ConBuf[0] = 0x18;
@@ -47,23 +47,23 @@ int ws10dof_range(struct ws10dofhandle * DevHandle, int AccRange, int GyroRange)
 	
 	}
 
-	printf("Acceleration Range set function set using [0x%x]", ConVal);//for debugging
+	printf("Acceleration Range set function set using [0x%x]\n", ConVal);//for debugging
 
 	i2c_write_to_reg(&DevHandle->I2CHandle, ACCEL_RANGE_REG, (char *)(&ConVal), 1);
 
-	//seeting gyro range
+	//setting gyro range
 	switch (GyroRange)
 	{	
-		case 2: ConVal = 0x00; DevHandle->GyroDiv = (131) ; break;
-		case 4: ConVal = 0x08; DevHandle->GyroDiv = (65.5) ; break;
-		case 8: ConVal = 0x10; DevHandle->GyroDiv = (32.8) ; break;
-		case 16: ConVal = 0x18; DevHandle->GyroDiv = (16.4) ; break;
+		case 250: ConVal = 0x00; DevHandle->GyroDiv = (131) ; break;
+		case 500: ConVal = 0x08; DevHandle->GyroDiv = (65.5) ; break;
+		case 1000: ConVal = 0x10; DevHandle->GyroDiv = (32.8) ; break;
+		case 2000: ConVal = 0x18; DevHandle->GyroDiv = (16.4) ; break;
 	
 		default: printf("invalid range setting of +- %d deg/s\n", AccRange); return -1;
 	
 	}
 
-	printf("Acceleration Range set function set using [0x%x]", ConVal);//for debugging
+	printf("gyroscope Range set function set using [0x%x]\n", ConVal);//for debugging
 
 	i2c_write_to_reg(&DevHandle->I2CHandle, GYRO_RANGE_REG, (char *)(&ConVal), 1);
 
@@ -85,28 +85,14 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 {
 	//read acceloromter
 	uint8_t Buf6Bytes[6];
-	uint16_t U16val;
-	int16_t S16val;
+
 	
 	i2c_read_from_reg(&DevHandle->I2CHandle, ACCEL_FIRST_REG, (char *)Buf6Bytes, 6);
 	
 	DevHandle->AccX = BuffToI16(&Buf6Bytes[0]) / DevHandle->AccDiv;
 	DevHandle->AccY = BuffToI16(&Buf6Bytes[2]) / DevHandle->AccDiv;
 	DevHandle->AccZ = BuffToI16(&Buf6Bytes[4]) / DevHandle->AccDiv;
-	/*
-	//x
-	U16val = ((uint16_t)Buf6Bytes[0] << 8)|((uint16_t)Buf6Bytes[1]);
-	S16val = (int16_t)U16val;
-	DevHandle->AccX = (S16val / DevHandle->AccDiv); 
-	//y
-	U16val = ((uint16_t)Buf6Bytes[2] << 8)|((uint16_t)Buf6Bytes[3]);
-	S16val = (int16_t)U16val;
-	DevHandle->AccY = (S16val / DevHandle->AccDiv); 
-	//z
-	U16val = ((uint16_t)Buf6Bytes[4] << 8)|((uint16_t)Buf6Bytes[5]);
-	S16val = (int16_t)U16val;
-	DevHandle->AccZ = (S16val / DevHandle->AccDiv); 
-	*/
+
 	
 	//read gyro
 	i2c_read_from_reg(&DevHandle->I2CHandle, GYRO_FIRST_REG, (char *)Buf6Bytes, 6);
@@ -114,6 +100,14 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	DevHandle->VelPitch = BuffToI16(&Buf6Bytes[0]) / DevHandle->GyroDiv;
 	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[2]) / DevHandle->GyroDiv;
 	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[4]) / DevHandle->GyroDiv;
+	
+	//reduce issues from gyro drift
+	if (DevHandle->VelPitch < GYRO_DRIFT_THRESHOLD)
+	{DevHandle->VelPitch = 0;}
+	if (DevHandle->VelRoll < GYRO_DRIFT_THRESHOLD)
+	{DevHandle->VelRoll = 0;}
+	if (DevHandle->VelYaw < GYRO_DRIFT_THRESHOLD)
+	{DevHandle->VelYaw = 0;}
 	
 	return 0;
 }
