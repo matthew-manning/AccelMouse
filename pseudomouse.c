@@ -30,6 +30,23 @@ struct pseudomouse startMouse(int AccelRange, int GyroRange)
  *other will put extrenal x, y and z velocities into struct
  */
 
+int autoLevel(struct pseudomouse * Mouse)
+{
+	//assumes mouse is stationary
+	
+	Mouse->ScrubGravity = sqrt(Mouse->DevHandle.AccX*Mouse->DevHandle.AccX + Mouse->DevHandle.AccY*Mouse->DevHandle.AccY + Mouse->DevHandle.AccZ*Mouse->DevHandle.AccZ);
+	printf ("scrub gravity is %0.2f\n", Mouse->ScrubGravity);
+	
+	Mouse->TiltPitch = 0.5*asin( (2*Mouse->DevHandle.AccZ) / (Mouse->DevHandle.AccX * Mouse->DevHandle.AccY) );
+	Mouse->TiltRoll = acos( Mouse->DevHandle.AccZ / cos(Mouse->TiltPitch) );
+	Mouse->TiltYaw = acos( Mouse->DevHandle.AccY / cos(Mouse->TiltRoll) );
+	printf("Accs are x: %0.2f, y: %0.2f, z: %0.2f\n", Mouse->DevHandle.AccX, Mouse->DevHandle.AccY, Mouse->DevHandle.AccZ);
+	printf ("auto level is pitch: %0.2f roll: %0.2f yaw: %0.2f\n", Mouse->TiltPitch, Mouse->TiltRoll, Mouse->TiltYaw);
+	
+	
+	return 0;
+}
+
 
 int updateSpeeds(struct pseudomouse * Mouse)
 {

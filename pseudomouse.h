@@ -27,5 +27,6 @@ struct pseudomouse
 struct pseudomouse startMouse();
 int updateSpeeds(struct pseudomouse * Mouse);
 int updateSpeeds_LS(struct pseudomouse * Mouse);
+int autoLevel(struct pseudomouse * Mouse);
 
 #endif

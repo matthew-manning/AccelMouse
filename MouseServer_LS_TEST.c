@@ -6,6 +6,7 @@
 
 #include "transferLib.h"
 #include "pseudomouse.h"
+#include "ws10dof.h"
 
 #include <time.h>
 #include <sys/types.h>
@@ -25,6 +26,8 @@ double CurTime;//times in ms
 int main(void)
 {
 	ServMouse = startMouse(16, 2000);
+	ws10dof_update( &(ServMouse.DevHandle) );
+	autoLevel(&ServMouse);
 	HostConnection = waitForHost(MOUSE_PORT);
 	printf("connection established\n");
 	RefTime = 0;
