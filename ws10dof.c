@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 struct ws10dofhandle ws10dof_start(int I2CBus, int Address, int AccRange, int GyroRange)
 {
@@ -85,6 +86,7 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 {
 	//read acceloromter
 	uint8_t Buf6Bytes[6];
+	
 
 	
 	i2c_read_from_reg(&DevHandle->I2CHandle, ACCEL_FIRST_REG, (char *)Buf6Bytes, 6);
@@ -96,17 +98,18 @@ int ws10dof_update(struct ws10dofhandle * DevHandle)
 	
 	//read gyro
 	i2c_read_from_reg(&DevHandle->I2CHandle, GYRO_FIRST_REG, (char *)Buf6Bytes, 6);
+	printf("buffer is %x%x%x%x%x%x\n", Buf6Bytes[0], Buf6Bytes[1], Buf6Bytes[2], Buf6Bytes[3], Buf6Bytes[4], Buf6Bytes[5]);
 	
 	DevHandle->VelPitch = BuffToI16(&Buf6Bytes[0]) / DevHandle->GyroDiv;
 	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[2]) / DevHandle->GyroDiv;
-	DevHandle->VelRoll = BuffToI16(&Buf6Bytes[4]) / DevHandle->GyroDiv;
+	DevHandle->VelYaw = BuffToI16(&Buf6Bytes[4]) / DevHandle->GyroDiv;
 	
 	//reduce issues from gyro drift
-	if (DevHandle->VelPitch < GYRO_DRIFT_THRESHOLD)
+	if (abs(DevHandle->VelPitch) < GYRO_DRIFT_THRESHOLD)
 	{DevHandle->VelPitch = 0;}
-	if (DevHandle->VelRoll < GYRO_DRIFT_THRESHOLD)
+	if (abs(DevHandle->VelRoll) < GYRO_DRIFT_THRESHOLD)
 	{DevHandle->VelRoll = 0;}
-	if (DevHandle->VelYaw < GYRO_DRIFT_THRESHOLD)
+	if (abs(DevHandle->VelYaw) < GYRO_DRIFT_THRESHOLD)
 	{DevHandle->VelYaw = 0;}
 	
 	return 0;

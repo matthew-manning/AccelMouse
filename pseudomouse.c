@@ -84,7 +84,7 @@ int updateSpeeds_LS(struct pseudomouse * Mouse)
 	//debug printouts
 	printf("adjusted accels, x: %0.2f, y: %0.2f, z: %0.2f\n", AccXAccel, AccYAccel, AccZAccel);//debug print of adjusted accelerartions
 	printf("gyro dervide angles, Pitch: %0.2f, Roll: %0.2f, Yaw: %0.2f\n", Mouse->TiltPitch, Mouse->TiltRoll, Mouse->TiltYaw);
-	printf("yaw velocity is %0.2f\n",Mouse->DevHandle.VelYaw );
+	printf("yaw velocity is %0.2f, roll %0.2f, pitch %0.2f\n",Mouse->DevHandle.VelYaw, Mouse->DevHandle.VelRoll, Mouse->DevHandle.VelPitch );
 	
 	
 	//calling periodically handles to x time between calculations, these values external realtive and scrubbed
